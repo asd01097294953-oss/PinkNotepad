@@ -1,34 +1,42 @@
 
-name: Build PinkNotepad
+name: Build PinkNotepad APK
 
 on:
   workflow_dispatch:
   push:
-    branches: [main, master]
+    paths:
+      - '**.zip'
+      - '.github/workflows/build.yml'
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Extract project
+      - name: Extract project ZIP
         run: |
-          unzip -o "PinkNotepad_2.0_아이콘포함_오류수정.zip" -d .
-          ls -la
+          ZIP_FILE=$(find . -maxdepth 1 -name 'PinkNotepad_2.0_아이콘포함_오류수정.zip' -print -quit)
+          if [ -z "$ZIP_FILE" ]; then
+            echo "아이콘 포함 ZIP 파일을 찾을 수 없습니다."
+            ls -la
+            exit 1
+          fi
+          unzip -o "$ZIP_FILE" -d .
 
-      - uses: actions/setup-java@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: '17'
 
-      - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: "8.9"
+      - name: Build APK
+        run: gradle assembleDebug
 
-      - run: gradle assembleDebug
-
-      - uses: actions/upload-artifact@v4
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
           name: PinkNotepad-APK
           path: app/build/outputs/apk/debug/app-debug.apk
