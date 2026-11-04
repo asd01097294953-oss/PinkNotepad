@@ -1,3 +1,4 @@
+
 name: Build PinkNotepad
 
 on:
@@ -10,6 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Extract project
+        run: |
+          unzip -o "PinkNotepad_2.0_아이콘포함_오류수정.zip" -d .
+          ls -la
 
       - uses: actions/setup-java@v4
         with:
