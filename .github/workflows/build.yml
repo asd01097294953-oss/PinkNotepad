@@ -21,6 +21,10 @@ jobs:
           PROJECT=$(find /tmp/pink-project -name settings.gradle.kts -printf '%h\n' | head -n 1)
           cp -a "$PROJECT"/. .
 
+      - name: Fix Java target
+        run: |
+          sed -i '/android {/a\    compileOptions {\n        sourceCompatibility = JavaVersion.VERSION_17\n        targetCompatibility = JavaVersion.VERSION_17\n    }' app/build.gradle.kts
+
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
